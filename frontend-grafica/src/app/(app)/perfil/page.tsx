@@ -11,7 +11,7 @@ import { Save, Camera } from "lucide-react";
 import Image from "next/image"; 
 import { useAuth } from "@/contexts/AuthContext"; 
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://127.0.0.1:8000';
+const BACKEND_URL = '/api';
 
 export default function PerfilPage() {
   const { userProfile, fetchUserProfile } = useAuth(); 
