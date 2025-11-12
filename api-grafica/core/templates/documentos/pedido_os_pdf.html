@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Ordem de Serviço #{{ pedido.id }}</title>
+    <style>
+        @page { size: A4; margin: 1cm; }
+        body { font-family: Arial, sans-serif; font-size: 10pt; color: #333; }
+        .header { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 15px; border-bottom: 1px solid #eee; }
+        .header .logo img { max-width: 200px; max-height: 80px; }
+        .header .title { text-align: right; }
+        .header h1 { margin: 0; font-size: 18pt; color: #1f2937; }
+        .header p { margin: 0; font-size: 10pt; color: #6b7280; }
+
+        /* --- INÍCIO DA CSS CORRIGIDA --- */
+        /* Este é o novo estilo para o selo PAGO */
+        .paid-stamp {
+            font-size: 24pt; /* Grande e legível */
+            font-weight: bold;
+            color: #22c55e; /* Verde */
+            border: 4px solid #22c55e; /* Borda verde */
+            padding: 5px 15px;
+            border-radius: 8px;
+            margin-top: 15px; /* Espaçamento */
+            display: inline-block; /* Para o padding e borda funcionarem */
+        }
+        /* --- FIM DA CSS CORRIGIDA --- */
+
+        .details { display: flex; justify-content: space-between; margin-top: 20px; margin-bottom: 30px; }
+        .details > div { width: 48%; }
+        .details h3 { font-size: 11pt; color: #1f2937; margin-bottom: 5px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+        .details p { margin: 4px 0; }
+        .items-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .items-table th, .items-table td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
+        .items-table thead { background-color: #f9fafb; }
+        .items-table th { font-weight: 600; color: #374151; }
+        .summary { margin-top: 20px; display: flex; justify-content: flex-end; }
+        .summary table { width: 45%; font-size: 11pt; }
+        .summary td { padding: 5px; }
+        .summary .total-row td { font-weight: bold; font-size: 14pt; padding-top: 10px; border-top: 1px solid #eee; }
+        .footer { position: fixed; bottom: -1cm; left: 0; right: 0; padding: 10px 0; border-top: 1px solid #eee; font-size: 8pt; color: #6b7280; display: flex; justify-content: space-between; flex-wrap: wrap; }
+        .footer div { width: 48%; margin-bottom: 5px; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="logo">
+            {% if logo_url %}
+                <img src="{{ logo_url }}" alt="Logo da Empresa" style="max-width: 200px; max-height: 80px;">
+            {% else %}
+                <span style="font-size: 24pt; font-weight: bold; color: #3b82f6;">
+                    {{ empresa.nome_empresa|default:"CLOUD GRÁFICA" }}
+                </span>
+            {% endif %}
+        </div>
+        <div class="title">
+            <h1>Ordem de Serviço N-{{ pedido.id }}</h1>
+            <p>Data: {{ pedido.data_criacao|date:"d/m/Y - H:i" }}</p>
+
+            {# --- INÍCIO DO HTML CORRIGIDO --- #}
+            {# Movido para cá, sem position:absolute #}
+            {% if is_paid %}
+                <div class="paid-stamp">PAGO</div>
+            {% endif %}
+            {# --- FIM DO HTML CORRIGIDO --- #}
+        </div>
+    </div>
+
+    <div class="details">
+        <div>
+            <h3>DADOS DO CLIENTE</h3>
+            <p><strong>Nome:</strong> {{ pedido.cliente.nome }}</p>
+            <p><strong>Whatsapp:</strong> {{ pedido.cliente.telefone|default:"" }}</p>
+        </div>
+        <div>
+            <h3>DETALHES DO PEDIDO</h3>
+            <p><strong>Status Produção:</strong> {{ pedido.status_producao }}</p>
+            <p><strong>Status Pagamento:</strong> {{ pedido.status_pagamento }}</p>
+        </div>
+    </div>
+
+    <table class="items-table">
+        <thead>
+            <tr>
+                <th>Produto</th>
+                <th>Preço</th>
+                <th>Qtd.</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in itens %}
+            <tr>
+                <td>
+                    {% if item.produto %}
+                        {{ item.produto.nome }}
+                    {% else %}
+                        {{ item.descricao_customizada }}
+                    {% endif %}
+                </td>
+                <td>
+                    {% if item.valor_unitario %}
+                        R$ {{ item.valor_unitario|floatformat:2 }}
+                    {% else %}
+                        R$ {{ item.subtotal|floatformat:2 }}
+                    {% endif %}
+                </td>
+                <td>{{ item.quantidade }}</td>
+                <td>R$ {{ item.subtotal|floatformat:2 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <div class="summary">
+        <table>
+            <tr class="total-row">
+                <td>Total:</td>
+                <td style="text-align: right;">R$ {{ pedido.valor_total|floatformat:2 }}</td>
+            </tr>
+        </table>
+    </div>
+    
+    <div class="footer">
+        <div><p>📞 {{ empresa.whatsapp|default:"" }}</p></div>
+        <div><p>🌐 {{ empresa.site|default:"" }}</p></div>
+        <div><p>✉️ {{ empresa.email|default:"" }}</p></div>
+        <div><p>📍 {{ empresa.endereco|default:"" }}, {{ empresa.numero|default:"" }} - {{ empresa.bairro|default:"" }}, {{ empresa.cidade|default:"" }}/{{ empresa.estado|default:"" }}</p></div>
+    </div>
+</body>
+</html>

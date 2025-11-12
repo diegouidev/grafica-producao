@@ -1,0 +1,78 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: grafica_db
+    environment:
+      POSTGRES_USER: grafica_user
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: grafica_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  api:
+    container_name: grafica-backend
+    build: ./api-grafica
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./api-grafica:/app
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
+    environment:
+      DB_HOST: db
+      DB_NAME: grafica_db
+      DB_USER: grafica_user
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+    depends_on:
+      - db
+  
+  frontend:
+    container_name: grafica-frontend
+    build: ./frontend-grafica
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend-grafica:/app
+      - /app/node_modules
+    environment:
+      # Ambiente LOCAL (mantém localhost enquanto você desenvolve)
+      NEXT_PUBLIC_API_URL: http://localhost:8000/api
+      NEXT_PUBLIC_BACKEND_URL: http://localhost:8000
+
+      # Comunicação entre containers (SSR)
+      INTERNAL_API_URL: http://api:8000/api
+      INTERNAL_BACKEND_URL: http://api:8000
+    depends_on:
+      - api
+
+  # ✅ SCHEDULER (rodando a cada 10 minutos)
+  scheduler:
+    container_name: grafica-scheduler
+    build: ./api-grafica     # usa a mesma imagem do backend (Django)
+    depends_on:
+      - api
+      - db
+    environment:
+      DB_HOST: db
+      DB_NAME: grafica_db
+      DB_USER: grafica_user
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - ./api-grafica:/app
+    command: >
+      sh -c 'echo "Iniciando scheduler: gerar_notificacoes A CADA 10 MINUTOS"; 
+             while true; do 
+               echo "[SCHEDULER] Executando gerar_notificacoes...";
+               python manage.py gerar_notificacoes || echo "[ERRO] Falha ao rodar gerar_notificacoes";
+               echo "[SCHEDULER] Aguardando 600 segundos...";
+               sleep 600;
+             done'
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

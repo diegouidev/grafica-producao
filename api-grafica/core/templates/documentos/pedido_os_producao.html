@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Ordem de Produção #{{ pedido.id }}</title>
+    <style>
+        @page { size: A4; margin: 1cm; }
+        body { font-family: Arial, sans-serif; font-size: 10pt; color: #333; }
+        
+        .header { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 15px; border-bottom: 1px solid #eee; }
+        .header .logo { font-size: 24pt; font-weight: bold; color: #3b82f6; }
+        .header .title { text-align: right; }
+        .header h1 { margin: 0; font-size: 18pt; color: #1f2937; }
+        .header p { margin: 0; font-size: 10pt; color: #6b7280; }
+        
+        .details { display: flex; justify-content: space-between; margin-top: 20px; margin-bottom: 30px; }
+        .details > div { width: 48%; }
+        .details h3 { font-size: 11pt; color: #1f2937; margin-bottom: 5px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+        .details p { margin: 4px 0; }
+
+        .entrega {
+            background-color: #fef9c3; /* Amarelo claro */
+            border: 1px solid #fde047; /* Amarelo escuro */
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .entrega h2 {
+            margin: 0;
+            font-size: 22pt;
+            color: #ca8a04; /* Amarelo bem escuro */
+        }
+        
+        .items-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .items-table th, .items-table td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
+        .items-table thead { background-color: #f9fafb; }
+        .items-table th { font-weight: 600; color: #374151; }
+        
+        .observacao-item {
+            font-size: 9pt;
+            color: #d9463f; /* Vermelho */
+            font-weight: bold;
+            padding-top: 5px;
+            white-space: pre-wrap; /* Preserva quebras de linha */
+        }
+
+        .arte-container {
+            margin-top: 30px;
+            page-break-inside: avoid; /* Tenta não quebrar a seção da arte */
+        }
+        .arte-container h2 {
+            font-size: 14pt;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+        .arte-container img {
+            max-width: 100%;
+            max-height: 500px;
+            border: 1px solid #ccc;
+            margin-top: 10px;
+        }
+        .sem-arte {
+            text-align: center;
+            padding: 20px;
+            background-color: #f3f4f6;
+            color: #6b7280;
+            font-style: italic;
+        }
+
+        .footer { position: fixed; bottom: -1cm; left: 0; right: 0; padding: 10px 0; border-top: 1px solid #eee; font-size: 8pt; color: #6b7280; text-align: center; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="logo">
+            {% if logo_url %}
+                <img src="{{ logo_url }}" alt="Logo da Empresa" style="max-width: 200px; max-height: 80px;">
+            {% else %}
+                <span>{{ empresa.nome_empresa|default:"CLOUD GRÁFICA" }}</span>
+            {% endif %}
+        </div>
+        <div class="title">
+            <h1>Ordem de Produção N-{{ pedido.id }}</h1>
+            <p>Data: {{ pedido.data_criacao|date:"d/m/Y - H:i" }}</p>
+        </div>
+    </div>
+
+    <div class="details">
+        <div>
+            <h3>DADOS DO CLIENTE</h3>
+            <p><strong>Nome:</strong> {{ pedido.cliente.nome }}</p>
+        </div>
+        <div>
+            <h3>DETALHES DO PEDIDO</h3>
+            <p><strong>Status Produção:</strong> {{ pedido.status_producao }}</p>
+            <p><strong>Status Arte:</strong> {{ pedido.get_status_arte_display }}</p>
+        </div>
+    </div>
+
+    {% if pedido.previsto_entrega %}
+    <div class="entrega">
+        <h2>ENTREGA: {{ pedido.previsto_entrega|date:"d/m/Y" }}</h2>
+    </div>
+    {% endif %}
+
+    <table class="items-table">
+        <thead>
+            <tr>
+                <th style="width: 50%;">Produto</th>
+                <th style="width: 10%;">Qtd.</th>
+                <th>Observações de Produção</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in itens %}
+            <tr>
+                <td>
+                    {% if item.produto %}
+                        {{ item.produto.nome }}
+                    {% else %}
+                        {{ item.descricao_customizada }}
+                    {% endif %}
+                    
+                    {% if item.largura and item.altura %}
+                        <br><small>Medidas: {{ item.largura }}m x {{ item.altura }}m</small>
+                    {% endif %}
+                </td>
+                <td>{{ item.quantidade }}</td>
+                <td>
+                    {% if item.observacoes_producao %}
+                        <div class="observacao-item">{{ item.observacoes_producao }}</div>
+                    {% else %}
+                        --
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <div class="arte-container">
+        <h2>Arte Aprovada</h2>
+        {% if arte_url %}
+            <img src="{{ arte_url }}" alt="Arte Aprovada">
+        {% else %}
+            <div class="sem-arte">
+                {% if pedido.status_arte == 'APROVADO' %}
+                    Status APROVADO, mas nenhum arquivo de arte foi encontrado.
+                {% else %}
+                    A arte deste pedido ainda não foi aprovada.
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="footer">
+        <p>Ordem de Produção Interna - {{ empresa.nome_empresa|default:"" }}</p>
+    </div>
+</body>
+</html>

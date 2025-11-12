@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Etiqueta {{ etiqueta.id }}</title>
+    <style>
+        @page {
+            size: A6; /* Tamanho da etiqueta */
+            margin: 0.5cm;
+        }
+        body { 
+            font-family: Arial, sans-serif; font-size: 14pt; 
+            display: flex; flex-direction: column; height: 95%;
+        }
+        .header { text-align: center; border-bottom: 2px dashed #ccc; padding-bottom: 10px; }
+        .header img { max-width: 150px; max-height: 60px; }
+
+        .content { flex: 1; padding-top: 15px; }
+        .content h1 { 
+            font-size: 24pt; margin: 0; padding: 0; 
+            color: #000; text-align: center;
+        }
+        .content p { font-size: 16pt; margin: 5px 0; }
+
+        .label { font-size: 12pt; color: #555; }
+        .info { font-size: 20pt; font-weight: bold; color: #000; }
+
+        .footer { 
+            border-top: 2px dashed #ccc; padding-top: 10px; 
+            font-size: 10pt; text-align: center; color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        {% if logo_url %}
+            <img src="{{ logo_url }}" alt="{{ empresa.nome_empresa }}">
+        {% else %}
+            <span style="font-size: 16pt; font-weight: bold;">{{ empresa.nome_empresa }}</span>
+        {% endif %}
+    </div>
+
+    <div class="content">
+        {% if etiqueta.tipo_cliente == 'CONDOMINIO' %}
+            <h1>ENTREGA PORTARIA</h1>
+            <p class="label">Para:</p>
+            <p class="info">{{ etiqueta.nome_responsavel }}</p>
+
+            <p class="label" style="margin-top: 15px;">Bloco:</p>
+            <p class="info">{{ etiqueta.bloco }}</p>
+
+            <p class="label" style="margin-top: 15px;">Apto:</p>
+            <p class="info">{{ etiqueta.apartamento }}</p>
+
+        {% else %} <h1>RETIRADA PORTARIA</h1>
+            <p class="label">Quem vai retirar:</p>
+            <p class="info">{{ etiqueta.nome_responsavel }}</p>
+
+            <p class="label" style="margin-top: 15px;">Entregue por (Diego/Jamille):</p>
+            <p class="info" style="font-size: 16pt;">
+                {{ empresa.nome_empresa }} <br>
+                (Bloco 24 / Apto 202)
+            </p>
+        {% endif %}
+    </div>
+
+    <div class="footer">
+        <p><strong>Instagram:</strong> {{ empresa.instagram|default:"" }} | <strong>WhatsApp:</strong> {{ empresa.whatsapp|default:"" }}</p>
+    </div>
+</body>
+</html>
