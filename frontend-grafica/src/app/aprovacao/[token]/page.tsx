@@ -11,7 +11,7 @@ import { Loader2, Check, X, FileWarning, MessageSquare } from "lucide-react";
 const formatCurrency = (value: string | number) =>
   new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(Number(value) || 0);
   
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://http://92.112.176.145//api";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://92.112.176.145/api";
 
 
 export default function PaginaAprovacao() {
