@@ -10,7 +10,7 @@ type MobileHeaderProps = {
   onMenuClick: () => void;
 };
 
-const BACKEND_URL = 'http://127.0.0.1:8000';
+const BACKEND_URL = 'http://92.112.176.145';
 
 export default function MobileHeader({ onMenuClick }: MobileHeaderProps) {
   const { empresaData } = useAuth();
