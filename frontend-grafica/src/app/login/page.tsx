@@ -8,7 +8,7 @@ import Image from 'next/image';
 import { ArrowRight, Eye, EyeOff, Lock } from 'lucide-react';
 
 
-const BACKEND_URL = '/api' || 'http://92.112.176.145';
+const BACKEND_URL = '/api';
 
 type EmpresaPublicData = {
   nome_empresa: string;
