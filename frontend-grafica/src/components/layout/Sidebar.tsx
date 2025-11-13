@@ -32,7 +32,7 @@ const navItems = [
 ];
 // -----------------------------------------------------------------
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://127.0.0.1:8000';
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://92.112.176.145';
 
 type SidebarProps = {
   isMobileOpen: boolean;
