@@ -281,7 +281,7 @@ class ItemPedido(models.Model):
 class ArtePedido(models.Model):
     # ... (código do ArtePedido sem alteração) ...
     pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE, related_name='artes')
-    layout = models.ImageField(upload_to='artes_pedidos/', help_text="Arquivo de imagem da arte")
+    layout = models.ImageField(upload_to='logos/', help_text="Arquivo de imagem da arte")
     comentarios_admin = models.TextField(blank=True, null=True, help_text="Comentários/instruções do admin")
     comentarios_cliente = models.TextField(blank=True, null=True, help_text="Comentários/revisões do cliente")
     data_upload = models.DateTimeField(default=timezone.now)
