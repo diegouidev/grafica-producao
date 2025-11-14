@@ -18,7 +18,7 @@ services:
     command: gunicorn app.wsgi:application --bind 0.0.0.0:8000
     
     volumes:
-      - media_volume:/app/media
+      - ./api_grafica:/app/media
       - api_static:/app/staticfiles  
     environment:
       DB_HOST: db
@@ -76,7 +76,7 @@ services:
       - "80:80" 
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - media_volume:/app/media:ro
+      - api_grafica:/app/media:ro
       - api_static:/app/staticfiles:ro          
     depends_on:
       - api
@@ -85,5 +85,5 @@ services:
 
 volumes:
   postgres_data:   
-  media_volume:
+  api_grafica:
   api_static: 
