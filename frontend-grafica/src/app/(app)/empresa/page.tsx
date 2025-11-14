@@ -14,7 +14,7 @@ import UserManagementTab from './UserManagementTab'; // <-- 3. IMPORTAR A NOVA A
 
 type EmpresaData = any;
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://127.0.0.1:8000';
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://92.112.176.145';
 
 export default function EmpresaPage() {
   const { hasRole } = useAuth(); // <-- 4. PEGAR A FUNÇÃO hasRole
