@@ -1,9 +1,4 @@
-version: '3.9'
-
-volumes:
-  postgres_data:
-  api_media:    
-  api_static:   
+version: '3.9'  
 
 services:
   db:
@@ -23,7 +18,8 @@ services:
     command: gunicorn app.wsgi:application --bind 0.0.0.0:8000
     
     volumes:
-      - ./api_grafica/media:/app/media         
+      - ./api_grafica/media:/app/media
+      - media_volume:/app/media
       - api_static:/app/staticfiles  
     environment:
       DB_HOST: db
@@ -81,9 +77,15 @@ services:
       - "80:80" 
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro 
-      - api_media:/app/media:ro                 
+      - api_media:/app/media:ro
+      - media_volume:/app/media:ro
       - api_static:/app/staticfiles:ro          
     depends_on:
       - api
       - frontend
     restart: unless-stopped
+
+volumes:
+  postgres_data:
+  api_media:    
+  api_static: 
